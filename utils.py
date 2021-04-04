@@ -5,13 +5,16 @@ import torch.optim as optim
 import torchvision.models as models
 import torchvision.transforms as transforms
 from torchtext.data.metrics import bleu_score
-
+import torch.optim as optim
 
 import matplotlib.pyplot as plt
 from PIL import Image
 import pandas as pd
+import numpy as np
 
 from datasets import Vocabulary
+
+from tqdm import tqdm
 
 
 # transforms
@@ -114,3 +117,69 @@ def print_scores(preds, trgs):
     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
     print("4:", bleu_score(preds, trgs)*100)
+
+    
+    
+
+def train(model, iterator, optimizer, criterion, clip):
+    
+    model.train()
+    
+    epoch_loss = 0
+    
+    for idx, (imgs, captions) in tqdm(enumerate(iterator), total=len(iterator), leave=False, desc="training"):
+        
+        optimizer.zero_grad()
+        
+        imgs = imgs.to(model.device)
+        captions = captions.to(model.device)
+        
+        outputs = model(imgs, captions[:-1])
+        #output = [trg len, batch size, output dim]
+        loss = criterion(
+                outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1)
+            )
+        
+
+        loss.backward()
+        
+        # clip the grads
+        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
+        
+        optimizer.step()
+        
+        epoch_loss += loss.item()
+        
+    return epoch_loss / len(iterator)
+
+
+def evaluate(model, iterator, criterion):
+    
+    model.eval()
+    
+    epoch_loss = 0
+    
+    with torch.no_grad():
+        for i, (images, captions) in tqdm(enumerate(iterator), total=len(iterator), leave=False, desc="Evaluating"):
+            
+            images = images.to(model.device)
+            captions = captions.to(model.device)
+            
+            outputs = model(images, captions[:-1])
+            #output = [trg len, batch size, output dim]
+            
+            loss = criterion(
+                outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1)
+            )
+            
+            epoch_loss += loss.item()
+    
+    return epoch_loss / len(iterator)
+
+
+
+def epoch_time(start_time, end_time):
+    elapsed_time = end_time - start_time
+    elapsed_mins = int(elapsed_time / 60)
+    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+    return elapsed_mins, elapsed_secs

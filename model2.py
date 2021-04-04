@@ -32,7 +32,7 @@ class DecoderRNN(nn.Module):
 
         self.hid_dim = hid_dim
         self.embedding = nn.Embedding(vocab_size, emb_dim)
-        self.rnn = nn.LSTM(emb_dim, hid_dim)
+        self.rnn = nn.GRU(emb_dim, hid_dim)
         self.linear = nn.Linear(hid_dim, vocab_size)
         self.dropout = nn.Dropout(dropout)
 
