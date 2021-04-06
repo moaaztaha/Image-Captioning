@@ -4,6 +4,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torchvision.models as models
 
+import random
+
 
 class DecoderRNN(nn.Module):
     def __init__(self, emb_dim, hid_dim, vocab_sz, dropout):
@@ -64,7 +66,7 @@ class DecoderRNN(nn.Module):
 
 
 class Img2Seq(nn.Module):
-    def __init__(self, encoder, decoder, tf_ratio=0.5, device):
+    def __init__(self, encoder, decoder, device, tf_ratio=0.5):
         super().__init__()
 
         self.tf_ratio = tf_ratio
@@ -101,6 +103,6 @@ class Img2Seq(nn.Module):
 
             teacher_force = random.random() < self.tf_ratio
 
-            input = trg[y] if teacher_force else top1
+            input = trg[t] if teacher_force else top1
 
         return outputs
