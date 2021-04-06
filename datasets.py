@@ -93,13 +93,13 @@ class Vocabulary:
                 for token in tokenized_text]
 
 
-def build_vocab(data_file, freq_threshold=2, split='train'):
+def build_vocab(data_file, freq_threshold=2, split='train', lang='en'):
     df = pd.read_csv(data_file)
     df = df[df['split'] == split]
     captions = df.caption.values
 
     vocab = Vocabulary(freq_threshold)
-    vocab.build_vocabulary(captions)
+    vocab.build_vocabulary(captions, lang)
 
     return vocab
 
