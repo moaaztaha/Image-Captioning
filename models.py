@@ -45,7 +45,7 @@ class DecoderLSTM(nn.Module):
 
 
 # decoder GRU
-class DecoderRNN(nn.Module):
+class DecoderGRU(nn.Module):
     def __init__(self, emb_dim, hid_dim, vocab_size, dropout):
         super().__init__()
 
