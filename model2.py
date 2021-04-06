@@ -25,7 +25,27 @@ class EncoderCNN(nn.Module):
         return features
 
 
-# decoder RNN
+# decoder LSTM
+class DecoderRNN(nn.Module):
+    def __init__(self, emb_dim, hid_dim, vocab_size, dropout):
+        super().__init__()
+
+        self.hid_dim = hid_dim
+        self.embedding = nn.Embedding(vocab_size, emb_dim)
+        self.rnn = nn.LSTM(emb_dim, hid_dim)
+        self.linear = nn.Linear(hid_dim, vocab_size)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, features, captions):
+        embeddings = self.dropout(self.embedding(captions))
+        embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
+        rnn_out, _ = self.rnn(embeddings)
+        outputs = self.linear(rnn_out)
+        return outputs
+
+# decoder GRU
+
+
 class DecoderRNN(nn.Module):
     def __init__(self, emb_dim, hid_dim, vocab_size, dropout):
         super().__init__()
