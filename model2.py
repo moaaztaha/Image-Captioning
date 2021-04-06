@@ -26,7 +26,7 @@ class EncoderCNN(nn.Module):
 
 
 # decoder LSTM
-class DecoderRNN(nn.Module):
+class DecoderLSTM(nn.Module):
     def __init__(self, emb_dim, hid_dim, vocab_size, dropout):
         super().__init__()
 
