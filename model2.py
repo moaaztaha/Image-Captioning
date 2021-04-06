@@ -66,10 +66,11 @@ class DecoderRNN(nn.Module):
 
 
 class Img2Seq(nn.Module):
-    def __init__(self, encoder, decoder, device, tf_ratio=0.5):
+    def __init__(self, encoder, decoder, device, teacher_forcing_ratio=0.5):
         super().__init__()
 
-        self.tf_ratio = tf_ratio
+        self.teacher_forcing_ratio = teacher_forcing_ratio
+
         self.encoder = encoder
         self.decoder = decoder
         self.device = device
@@ -101,8 +102,8 @@ class Img2Seq(nn.Module):
 
             top1 = output.argmax(1)
 
-            teacher_force = random.random() < self.tf_ratio
+            teacher_forcing = random.random() < self.teacher_forcing_ratio
 
-            input = trg[t] if teacher_force else top1
+            input = trg[t] if teacher_forcing else top1
 
         return outputs
