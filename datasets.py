@@ -6,6 +6,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 from PIL import Image
 
+import pyarabic.araby as araby
 import pandas as pd
 import spacy
 
@@ -63,15 +64,18 @@ class Vocabulary:
         return len(self.itos)
 
     @staticmethod
-    def tokenize_en(text):
-        return [tok.text for tok in spacy_en.tokenizer(text.lower())]
+    def tokenize_en(text, lang='en'):
+        if lang == 'ar':
+            return [tok for tok in araby.tokenize(text.lower())]
+        else:
+            return [tok.text for tok in spacy_en.tokenizer(text.lower())]
 
-    def build_vocabulary(self, sentence_list):
+    def build_vocabulary(self, sentence_list, lang='en'):
         freqs = {}
         idx = 4
 
         for sentence in sentence_list:
-            for word in self.tokenize_en(sentence):
+            for word in self.tokenize_en(sentence, lang):
                 if word not in freqs:
                     freqs[word] = 1
                 else:
