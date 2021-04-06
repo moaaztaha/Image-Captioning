@@ -43,9 +43,8 @@ class DecoderLSTM(nn.Module):
         outputs = self.linear(rnn_out)
         return outputs
 
+
 # decoder GRU
-
-
 class DecoderRNN(nn.Module):
     def __init__(self, emb_dim, hid_dim, vocab_size, dropout):
         super().__init__()
