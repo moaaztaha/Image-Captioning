@@ -102,7 +102,7 @@ class Img2Seq(nn.Module):
 
             top1 = output.argmax(1)
 
-            teacher_forcing = random.random() < teacher_forcing_ratio
+            teacher_forcing = random.random() < self.teacher_forcing_ratio
 
             input = trg[t] if teacher_forcing else top1
 
