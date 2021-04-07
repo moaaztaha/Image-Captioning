@@ -27,6 +27,18 @@ transform = transforms.Compose([
 ])
 
 
+def show_image(image=None, file_name=False, root_dir=None):
+    if file_name:
+        img = Image.open(root_dir+file_name).convert("RGB")
+        plt.imshow(img)
+
+    img = image.permute(1, 2, 0)
+    print(img.size)
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
+
+
 def caption_image(image, model, vocab, max_len=50):
 
     model.eval()
@@ -34,7 +46,7 @@ def caption_image(image, model, vocab, max_len=50):
 
     with torch.no_grad():
         context = model.encoder(image.to(model.device)).unsqueeze(0)
-        #hidden = torch.tensor(vocab.stoi["<sos>"]).unsqueeze(0).to(model.device)
+        # hidden = torch.tensor(vocab.stoi["<sos>"]).unsqueeze(0).to(model.device)
         states = None
 
         for _ in range(1, max_len):
@@ -118,64 +130,60 @@ def print_scores(preds, trgs):
     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
     print("4:", bleu_score(preds, trgs)*100)
 
-    
-    
 
 def train(model, iterator, optimizer, criterion, clip):
-    
+
     model.train()
-    
+
     epoch_loss = 0
-    
+
     for idx, (imgs, captions) in tqdm(enumerate(iterator), total=len(iterator), leave=False, desc="training"):
-        
+
         optimizer.zero_grad()
-        
+
         imgs = imgs.to(model.device)
         captions = captions.to(model.device)
-        
+
         outputs = model(imgs, captions[:-1])
-        #output = [trg len, batch size, output dim]
+        # output = [trg len, batch size, output dim]
         loss = criterion(
-                outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1)
-            )
-        
+            outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1)
+        )
 
         loss.backward()
-        
+
         # clip the grads
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-        
+
         optimizer.step()
-        
+
         epoch_loss += loss.item()
-        
+
     return epoch_loss / len(iterator)
 
 
 def evaluate(model, iterator, criterion):
-    
+
     model.eval()
-    
+
     epoch_loss = 0
-    
+
     with torch.no_grad():
         for i, (images, captions) in tqdm(enumerate(iterator), total=len(iterator), leave=False, desc="Evaluating"):
-            
+
             images = images.to(model.device)
             captions = captions.to(model.device)
-            
+
             outputs = model(images, captions[:-1])
-            #output = [trg len, batch size, output dim]
-            
+            # output = [trg len, batch size, output dim]
+
             loss = criterion(
                 outputs.reshape(-1, outputs.shape[2]), captions.reshape(-1)
             )
-            
-            epoch_loss += loss.item()
-    
-    return epoch_loss / len(iterator)
 
+            epoch_loss += loss.item()
+
+    return epoch_loss / len(iterator)
 
 
 def epoch_time(start_time, end_time):

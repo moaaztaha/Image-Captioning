@@ -16,8 +16,8 @@ class DecoderRNN(nn.Module):
 
         self.embedding = nn.Embedding(vocab_sz, emb_dim)
 
-        # GRU: inputs-> [embeddings + context], output -> hidden, output
-        self.rnn = nn.GRU(emb_dim+hid_dim, hid_dim)
+        # LSTM: inputs-> [embeddings + context], output -> hidden, output
+        self.rnn = nn.LSTM(emb_dim+hid_dim, hid_dim)
 
         # FC: inputs:-> [embeddings + context + output]
         self.fc_out = nn.Linear(emb_dim + hid_dim*2, vocab_sz)
