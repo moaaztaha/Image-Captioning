@@ -73,7 +73,7 @@ class Img2Seq(nn.Module):
 
         assert self.encoder.hid_dim == self.decoder.hid_dim
 
-    def forward(self, images, captions):
-        features = self.encoder(images)
-        outputs = self.decoder(features, captions)
+    def forward(self, x, y):
+        features = self.encoder(x)
+        outputs = self.decoder(features, y)
         return outputs
