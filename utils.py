@@ -191,3 +191,71 @@ def epoch_time(start_time, end_time):
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
+
+
+# show, attend, and tell
+def init_embedding(embeddings):
+    # fills embedding tensor with values from uniform distribution
+    bias = np.sqrt(3.0 / embeddings.size(1))
+    torch.nn.init.uniform_(embeddings, -bias, bias)
+
+
+def clip_gradient(optimizer, grad_clip):
+    for group in optimizer.param_groups:
+        for param in group['params']:
+            if param.grad is not None:
+                param.grad.data.clamp_(-grad_clip, grad_clip)
+
+
+def save_checkpoint(data_name, epoch, epochs_since_improvement, encoder, decoder, encoder_optimizer, decoder_optimizer, bleu4, is_best):
+    state = {
+        'epoch': epoch,
+        'epochs_since_imrovment': epochs_since_improvement,
+        'bleu-4': bleu4,
+        'encoder': encoder,
+        'decoder': decoder,
+        'encoder_optimizer': encoder_optimizer,
+        'deocder_optimizer': decoder_optimizer,
+    }
+
+    file_name = 'checkpoint_' + data_name + '.pth.tar'
+    torch.save(state, file_name)
+
+    if is_best:
+        torch.save(state, 'BEST_' + file_name)
+
+
+class AverageMeter:
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+
+def adjust_learning_rate(optimizer, shrink_factor):
+    # shrink learning rate by a specified factor
+    print('Decaying learning rate')
+
+    for param_group in optimizer.param_groups():
+        param_group['lr'] = param_group['lr'] * shrink_factor
+
+    print(f"The new learning rate is {optimizer.param_groups[0]['lr']}")
+
+
+def accuracy(scores, targets, k):
+    # compute top-k accuracy from predicted and true labels
+    batch_size = targets.size(0)
+    _, ind = scores.top(k, 1, True, True)
+    correct = ind.eq(targets.view(-1, 1).expand_as(ind))
+    correct_total = correct.view(-1).float().sum()  # 0D tensor
+    return correct_total.item() * (100.0 / batch_size)
