@@ -89,8 +89,8 @@ class Vocabulary:
     def numericalize(self, text):
         tokenized_text = self.tokenize_en(text)
 
-        return [self.stoi[token] if token in self.stoi else self.stoi["<unk>"]
-                for token in tokenized_text]
+        return [self.stoi['<sos>']] + [self.stoi[token] if token in self.stoi else self.stoi["<unk>"]
+                                       for token in tokenized_text] + [self.stoi['<eos>']]
 
 
 def build_vocab(data_file, freq_threshold=2, split='train', lang='en'):
