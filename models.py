@@ -85,7 +85,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 class Encoder(nn.Module):
-    def __init__(self, encoded_image_size):
+    def __init__(self, encoded_image_size=14):
         super().__init__()
 
         resnet = models.resnet34(pretrained=True)
@@ -158,7 +158,7 @@ class DecoderWithAttention(nn.Module):
 
         self.attention = Attention(encoder_dim, decoder_dim, attention_dim)
 
-        self.embeding = nn.Embedding(vocab_size, embed_dim)
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
         self.dropout = nn.Dropout(p=self.dropout)
         self.decode_step = nn.LSTMCell(embed_dim + encoder_dim, decoder_dim, bias=True)
         self.init_h = nn.Linear(encoder_dim, decoder_dim)
