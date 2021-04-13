@@ -58,20 +58,20 @@ class CaptionDataset(Dataset):
 
         # loading current caption
         cap_len = self.df['tok_len'].values[index]
-        caption = self.df['caption'].values[index]
-        caption = torch.LongTensor(self.vocab.numericalize(caption, cap_len))
+        tokens = self.df['tokens'].values[index]
+        caption = torch.LongTensor(self.vocab.numericalize(tokens, cap_len))
 
         if self.split is 'train':
             return img, caption, cap_len
         else:
             # for val and test return all captions for calculate the bleu scores
-            captions_text = self.df[self.df['file_name']
-                                    == img_id].caption.values
-            all_captions = []
-            for cap in captions_text:
-                all_captions.append(self.vocab.numericalize(cap))
+            captions_tokens = self.df[self.df['file_name'] == img_id].tokens.values
+            captions_lens = self.df[self.df['file_name'] == img_id].tok_len.values
+            all_tokens = []
+            for token, cap_len in zip(captions_tokens, captions_lens):
+                all_tokens.append(self.vocab.numericalize(token, cap_len))
 
-            return img, caption, cap_len, all_captions
+            return img, caption, cap_len, all_tokens
 
 
 def build_vocab(data_file, freq_threshold=2, split='train'):
@@ -96,9 +96,9 @@ class Vocabulary:
     def __len__(self):
         return len(self.itos)
 
-    @staticmethod
-    def tokenize_en(text):
-        return [tok.text for tok in spacy_en.tokenizer(text.lower())]
+    # @staticmethod
+    # def tokenize_en(text):
+    #     return [tok.text for tok in spacy_en.tokenizer(text.lower())]
 
     def build_vocabulary(self, tokens_list):
         freqs = {}
@@ -118,11 +118,9 @@ class Vocabulary:
                     self.itos[idx] = word
                     idx += 1
 
-    def numericalize(self, text, cap_len):
-        tokenized_text = self.tokenize_en(text)
-
+    def numericalize(self, tokens, cap_len):
         return [self.stoi['<sos>']] + [self.stoi[token] if token in self.stoi else self.stoi["<unk>"]
-                                       for token in tokenized_text] + [self.stoi['<eos>']] + [self.stoi['<pad>']] * (self.max_len - cap_len)
+                                       for token in tokens] + [self.stoi['<eos>']] + [self.stoi['<pad>']] * (self.max_len - cap_len)
 
 
 # class collate_fn:
