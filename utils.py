@@ -255,7 +255,8 @@ def adjust_learning_rate(optimizer, shrink_factor):
 def accuracy(scores, targets, k):
     # compute top-k accuracy from predicted and true labels
     batch_size = targets.size(0)
-    _, ind = scores.top(k, 1, True, True)
+    # _, ind = scores.top(k, 1, True, True)
+    _, ind = torch.topk(scores, 5)
     correct = ind.eq(targets.view(-1, 1).expand_as(ind))
     correct_total = correct.view(-1).float().sum()  # 0D tensor
     return correct_total.item() * (100.0 / batch_size)

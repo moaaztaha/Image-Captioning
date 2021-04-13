@@ -69,9 +69,9 @@ class CaptionDataset(Dataset):
             captions_lens = self.df[self.df['file_name'] == img_id].tok_len.values
             all_tokens = []
             for token, cap_len in zip(captions_tokens, captions_lens):
-                all_tokens.append(self.vocab.numericalize(token, cap_len))
+                all_tokens.append(self.vocab.numericalize(token, cap_len)[1:]) # remove <sos>
 
-            return img, caption, cap_len, all_tokens
+            return img, caption, cap_len, torch.tensor(all_tokens)
 
 
 def build_vocab(data_file, freq_threshold=2, split='train'):
