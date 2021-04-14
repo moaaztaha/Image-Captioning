@@ -11,27 +11,19 @@ import torchvision.transforms as transforms
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence
 from models import Encoder, DecoderWithAttention
-from datasets import *
+from dataset import *
 from utils import *
 from nltk.translate.bleu_score import corpus_bleu
 
 import numpy as np
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-# Training parameters
-start_epoch = 0
-epochs = 120  # number of epochs to train for (if early stopping is not triggered)
-epochs_since_improvement = 0  # keeps track of number of epochs since there's been an improvement in validation BLEU
-batch_size = 32
-workers = 1  # for data-loading; right now, only 1 works with h5py
-encoder_lr = 1e-4  # learning rate for encoder if fine-tuning
-decoder_lr = 4e-4  # learning rate for decoder
+
+# training parameters
 grad_clip = 5.  # clip gradients at an absolute value of
 alpha_c = 1.  # regularization parameter for 'doubly stochastic attention', as in the paper
-best_bleu4 = 0.  # BLEU-4 score right now
 print_freq = 100  # print training/validation stats every __ batches
-fine_tune_encoder = False  # fine-tune encoder?
-checkpoint = None  # path to checkpoint, None if none
+
 
 
 def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_optimizer, epoch):
@@ -101,7 +93,7 @@ def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_
         start = time.time()
 
 
-        # rint status
+        # print status
         if i % print_freq == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Batch Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
@@ -204,3 +196,122 @@ def validate(val_loader, encoder, decoder, criterion):
                 bleu=bleu4))
 
     return bleu4
+
+
+
+def fit(t_params, checkpoint=None, m_params=None):
+
+    # info
+    data_name = t_params['data_name']
+    imgs_path = t_params['imgs_path']
+    df_path = t_params['df_path']
+    vocab = t_params['vocab']
+
+    start_epoch = 0
+    epochs_since_improvement = 0
+    best_bleu4 = 0
+    epochs = t_params['epochs']
+    batch_size = t_params['batch_size']
+    workers = t_params['workers']
+    encoder_lr = t_params['encoder_lr']
+    decoder_lr = t_params['decoder_lr']
+    fine_tune_encoder = t_params['fine_tune_encoder']
+
+
+    # init / load checkpoint
+    if checkpoint is None:
+
+        # getting hyperparameters
+        attention_dim = m_params['attention_dim']
+        embed_dim = m_params['embed_dim']
+        decoder_dim = m_params['decoder_dim']
+        encoder_dim = m_params['encoder_dim']
+        dropout = m_params['dropout']
+
+        decoder = DecoderWithAttention(attention_dim=attention_dim,
+                                      embed_dim=embed_dim,
+                                      decoder_dim=decoder_dim,
+                                      encoder_dim=encoder_dim,
+                                      vocab_size=len(vocab),
+                                      dropout=dropout)
+        decoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, decoder.parameters()),
+                                            lr=decoder_lr)
+        
+        encoder=Encoder()
+        encoder.fine_tune(fine_tune_encoder)
+        encoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, encoder.parameters()),
+                                            lr=encoder_lr) if fine_tune_encoder else None
+    # load checkpoint
+    else:
+        checkpoint = torch.load(checkpoint)
+        start_epoch = checkpoint['epoch'] + 1
+        epochs_since_improvement = checkpoint['epochs_since_improvement']
+        best_bleu4 = checkpoint['bleu-4']
+        decoder = checkpoint['decoder']
+        decoder_optimizer = checkpoint['decoder_optimizer']
+        encoder = checkpoint['encoder']
+        encoder_optimizer = checkpoint['encoder_optimizer']
+        if fine_tune_encoder is True and encoder_optimizer is None:
+            encoder.fine_tune(fine_tune_encoder)
+            encoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, encoder.parameters()),
+                                                lr=encoder_lr)
+            
+    # move to gpu, if available
+    decoder = decoder.to(device)
+    encoder = encoder.to(device)
+    
+    # loss function
+    criterion = nn.CrossEntropyLoss().to(device)
+    
+    # dataloaders
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    print('Loading Data')
+    train_loader, val_loader = get_loaders(batch_size, imgs_path, df_path, transform, vocab, workers)
+    print('_'*50)
+
+    print('-'*20, 'Fitting', '-'*20)
+    for epoch in range(start_epoch, epochs):
+        
+        # decay lr is there is no improvement for 8 consecutive epochs and terminate after 20
+        if epochs_since_improvement == 20:
+            print('No improvement for 20 consecutive epochs, terminating...')
+            break
+        if epochs_since_improvement > 0 and epochs_since_improvement % 8 == 0:
+            adjust_learning_rate(decoder_optimizer, 0.8)
+            if fine_tune_encoder:
+                adjust_learning_rate(encoder_optimizer, 0.8)
+        
+        # one epoch of training
+        train(train_loader=train_loader,
+            encoder=encoder,
+            decoder=decoder,
+            criterion=criterion,
+            encoder_optimizer=encoder_optimizer,
+            decoder_optimizer=decoder_optimizer,
+            epoch=epoch)
+        
+        # one epoch of validation
+        recent_bleu4 = validate(val_loader=val_loader,
+            encoder=encoder,
+            decoder=decoder,
+            criterion=criterion)
+
+        
+        # check for improvement
+        is_best = recent_bleu4 > best_bleu4
+        best_bleu4 = max(recent_bleu4, best_bleu4)
+        if not is_best:
+            epochs_since_improvement += 1
+            print(f'\nEpochs since last improvement: {epochs_since_improvement,}')
+        else:
+            # reset
+            epochs_since_improvement = 0
+        
+        save_checkpoint(data_name, epoch, epochs_since_improvement, encoder, decoder, encoder_optimizer,
+            decoder_optimizer, recent_bleu4, is_best)

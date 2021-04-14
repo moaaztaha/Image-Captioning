@@ -3,6 +3,7 @@
 *.pt
 *.zip
 Images/
+*.pth.tar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
