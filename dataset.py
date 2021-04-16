@@ -122,6 +122,11 @@ class Vocabulary:
         return [self.stoi['<sos>']] + [self.stoi[token] if token in self.stoi else self.stoi["<unk>"]
                                        for token in tokens] + [self.stoi['<eos>']] + [self.stoi['<pad>']] * (self.max_len - cap_len)
 
+    def indextostring(self, idx):
+        sent_tokens = []
+        for sent in idx:
+            sent_tokens.append([self.itos[i] for i in sent if i not in {self.stoi['<sos>'], self.stoi['<pad>'], self.stoi['<eos>']}])
+        return sent_tokens
 
 # class collate_fn:
 #     def __init__(self, pad_idx, split='train'):

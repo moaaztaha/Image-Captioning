@@ -100,7 +100,7 @@ def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_
                                                                           top5=top5accs))
         
 
-def validate(val_loader, encoder, decoder, criterion):
+def validate(val_loader, encoder, decoder, criterion, vocab):
 
     decoder.eval()
     if encoder is not None:
@@ -166,8 +166,8 @@ def validate(val_loader, encoder, decoder, criterion):
             allcaps = allcaps[sort_ind]
             for j in range(allcaps.shape[0]):
                 img_caps = allcaps[j].tolist()
-                # check if it has <sos> token and remove it 
-                references.append(img_caps)
+                references.append(vocab.indextostring(img_caps))
+            
 
             # hypotheses
             _, preds = torch.max(scores_copy, dim=2)
@@ -176,7 +176,7 @@ def validate(val_loader, encoder, decoder, criterion):
             for j, p in enumerate(preds):
                 temp_preds.append(preds[j][:decode_lengths[j]]) # remove pads
             
-            preds = temp_preds
+            preds = vocab.indextostring(temp_preds)
             hypotheses.extend(preds)
 
             assert len(references) == len(hypotheses)
@@ -239,18 +239,19 @@ def fit(t_params, checkpoint=None, m_params=None):
     # load checkpoint
     else:
         checkpoint = torch.load(checkpoint)
+        print('Loaded Checkpoint!!')
         start_epoch = checkpoint['epoch'] + 1
-        epochs_since_improvement = checkpoint['epochs_since_improvement']
+        print(f"Starting Epoch: {start_epoch}")
+        epochs_since_improvement = checkpoint['epochs_since_imrovment']
         best_bleu4 = checkpoint['bleu-4']
         decoder = checkpoint['decoder']
-        decoder_optimizer = checkpoint['decoder_optimizer']
+        decoder_optimizer = checkpoint['deocder_optimizer']
         encoder = checkpoint['encoder']
         encoder_optimizer = checkpoint['encoder_optimizer']
         if fine_tune_encoder is True and encoder_optimizer is None:
             encoder.fine_tune(fine_tune_encoder)
             encoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, encoder.parameters()),
                                                 lr=encoder_lr)
-            
     # move to gpu, if available
     decoder = decoder.to(device)
     encoder = encoder.to(device)
@@ -298,7 +299,8 @@ def fit(t_params, checkpoint=None, m_params=None):
         recent_bleu4 = validate(val_loader=val_loader,
             encoder=encoder,
             decoder=decoder,
-            criterion=criterion)
+            criterion=criterion,
+            vocab=vocab)
 
         
         # check for improvement
