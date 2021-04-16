@@ -1,8 +1,3 @@
-py_files_path = '../'
-import sys
-sys.path.append(py_files_path)
-
-
 import time
 import torch.backends.cudnn as cudnn
 import torch.optim
@@ -297,6 +292,9 @@ def fit(t_params, checkpoint=None, m_params=None):
             epoch=epoch)
         
         # one epoch of validation
+        print('_'*50)
+
+        print('-'*20, 'Validation', '-'*20)
         recent_bleu4 = validate(val_loader=val_loader,
             encoder=encoder,
             decoder=decoder,
