@@ -282,6 +282,8 @@ def fit(t_params, checkpoint=None, m_params=None):
             if fine_tune_encoder:
                 adjust_learning_rate(encoder_optimizer, 0.8)
         
+        print('_'*50)
+        print('-'*20, 'Training', '-'*20)
         # one epoch of training
         train(train_loader=train_loader,
             encoder=encoder,
@@ -292,8 +294,6 @@ def fit(t_params, checkpoint=None, m_params=None):
             epoch=epoch)
         
         # one epoch of validation
-        print('_'*50)
-
         print('-'*20, 'Validation', '-'*20)
         recent_bleu4 = validate(val_loader=val_loader,
             encoder=encoder,
