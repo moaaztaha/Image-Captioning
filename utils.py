@@ -190,7 +190,7 @@ def adjust_learning_rate(optimizer, shrink_factor):
     # shrink learning rate by a specified factor
     print('Decaying learning rate')
 
-    for param_group in optimizer.param_groups():
+    for param_group in optimizer.param_groups:
         param_group['lr'] = param_group['lr'] * shrink_factor
 
     print(f"The new learning rate is {optimizer.param_groups[0]['lr']}")
