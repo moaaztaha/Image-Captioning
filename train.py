@@ -268,7 +268,7 @@ def fit(t_params, checkpoint=None, m_params=None):
     ])
 
     print('Loading Data')
-    train_loader, val_loader = get_loaders(batch_size, imgs_path, df_path, transform, vocab, workers)
+    train_loader, val_loader = get_loaders(batch_size, imgs_path, df_path, transform, vocab, False ,workers)
     print('_'*50)
 
     print('-'*20, 'Fitting', '-'*20)
