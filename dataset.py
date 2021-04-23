@@ -13,7 +13,7 @@ spacy_en = spacy.load('en')
 
 
 class CaptionDataset(Dataset):
-    """
+    """ 
     Caption Dataset Class
     """
 
@@ -154,8 +154,21 @@ class Vocabulary:
 #         return images, captions
 
 
-def get_loaders(bs, images_path, df_path, transform, vocab, n_workers=0):
+def get_loaders(bs, images_path, df_path, transform, vocab, test=False, n_workers=0):
     #pad_idx = vocab.stoi['<pad>']
+
+    if test:
+        test_loader = DataLoader(
+            dataset=CaptionDataset(images_path, df_path,
+                                    transforms=transform, vocab=vocab, split='test'),
+            batch_size=bs,
+            num_workers=n_workers,
+            shuffle=True,
+            pin_memory=True
+        )
+        return test_loader
+
+
 
     train_loader = DataLoader(
         dataset=CaptionDataset(images_path, df_path,

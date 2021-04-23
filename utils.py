@@ -204,3 +204,16 @@ def accuracy(scores, targets, k):
     correct = ind.eq(targets.view(-1, 1).expand_as(ind))
     correct_total = correct.view(-1).float().sum()  # 0D tensor
     return correct_total.item() * (100.0 / batch_size)
+
+
+def load_checkpoint(path):
+
+    checkpoint = torch.load(path)
+    
+    print('Loaded Checkpoint!!')
+    last_epoch = checkpoint['epoch']
+    best_bleu4 = checkpoint['bleu-4']
+
+    print(f"Last Epoch: {last_epoch}\nBest Bleu-4: {best_bleu4}")
+
+    return checkpoint
