@@ -125,10 +125,12 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
 
 
 def print_scores(preds, trgs):
+    print('----- Bleu-n Scores -----')
     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
     print("4:", bleu_score(preds, trgs)*100)
+    print('-'*25)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time

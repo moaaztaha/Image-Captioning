@@ -184,6 +184,9 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
         # Calculate BLEU-4 scores
         bleu4 = corpus_bleu(references, hypotheses)
 
+        # print scores
+        print_scores(hypotheses, references)
+
         print(
             '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(
                 loss=losses,
