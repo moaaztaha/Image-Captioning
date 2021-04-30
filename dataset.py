@@ -74,9 +74,10 @@ class CaptionDataset(Dataset):
             return img, caption, cap_len, torch.tensor(all_tokens)
 
 
-def build_vocab(data_file, freq_threshold=2, split='train'):
+def build_vocab(data_file, freq_threshold=2, split=None):
     df = pd.read_json(data_file)
-    df = df[df['split'] == split]
+    if split:
+        df = df[df['split'] == split]
 
     tokens = df.tokens.values
 
