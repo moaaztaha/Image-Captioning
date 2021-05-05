@@ -29,14 +29,16 @@ transform = transforms.Compose([
 
 def show_image(image=None, file_name=False, root_dir=None):
     if file_name:
-        img = Image.open(root_dir+file_name).convert("RGB")
+        if root_dir:
+            img = Image.open(root_dir+image).convert("RGB")
+        img = Image.open(image).convert("RGB")
         plt.imshow(img)
-
-    img = image.permute(1, 2, 0)
-    print(img.size)
-    plt.imshow(img)
-    plt.axis('off')
-    plt.show()
+    else:        
+        img = image.permute(1, 2, 0)
+        print(img.size)
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()
 
 
 def caption_image(image, model, vocab, max_len=50):

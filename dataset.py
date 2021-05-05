@@ -57,7 +57,7 @@ class CaptionDataset(Dataset):
             img = transfroms.ToTensor()(img)
 
         # loading current caption
-        cap_len = self.df['tok_len'].values[index]
+        cap_len = self.df['tok_len'].values[index] + 2 # <sos> and <eos>
         tokens = self.df['tokens'].values[index]
         caption = torch.LongTensor(self.vocab.numericalize(tokens, cap_len))
 

@@ -55,6 +55,7 @@ def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_
         scores = pack_padded_sequence(scores, decode_lengths, batch_first=True).data
         targets = pack_padded_sequence(targets, decode_lengths, batch_first=True).data
 
+
         # calculate the loss
         loss = criterion(scores, targets)
 
