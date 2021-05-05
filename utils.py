@@ -33,6 +33,7 @@ def show_image(image=None, file_name=False, root_dir=None):
             img = Image.open(root_dir+image).convert("RGB")
         img = Image.open(image).convert("RGB")
         plt.imshow(img)
+        plt.show()
     else:        
         img = image.permute(1, 2, 0)
         print(img.size)
