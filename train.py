@@ -232,12 +232,12 @@ def fit(t_params, checkpoint=None, m_params=None):
                                       encoder_dim=encoder_dim,
                                       vocab_size=len(vocab),
                                       dropout=dropout)
-        decoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, decoder.parameters()),
+        decoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, decoder.parameters()),
                                             lr=decoder_lr)
         
         encoder=Encoder()
         encoder.fine_tune(fine_tune_encoder)
-        encoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, encoder.parameters()),
+        encoder_optimizer = torch.optim.Adam(params=filter(lambda p:p.requires_grad, encoder.parameters()),
                                             lr=encoder_lr) if fine_tune_encoder else None
     # load checkpoint
     else:
