@@ -3,6 +3,7 @@
 *.pt
 *.zip
 Images/
+glove.6B/
 *.pth.tar
 
 # Byte-compiled / optimized / DLL files
