@@ -101,7 +101,7 @@ class DecoderWithAttention(nn.Module):
         self.fc.weight.data.uniform_(-0.1, 0.1)
 
     def load_pretrained_embeddings(self, embeddings):
-        self.embeddings.weight = nn.Parameter(embeddings)
+        self.embedding.weight = nn.Parameter(embeddings)
     
     def fine_tune_embeddings(self, fine_tune=True):
         for p in self.embedding.parameters():
