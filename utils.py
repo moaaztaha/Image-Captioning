@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import pandas as pd
 import numpy as np
-
+import os, json
+from collections import Counter
 from dataset import Vocabulary
 
 from tqdm import tqdm
@@ -230,3 +231,46 @@ def load_checkpoint(path):
     print(f"Last Epoch: {last_epoch}\nBest Bleu-4: {best_bleu4}")
 
     return checkpoint
+
+
+
+COMMAND = '!wget http://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip'
+
+def build_dataset(file_path='dataset_coco.json', df_name='coco.json'):
+
+    # download files
+    os.system(COMMAND)
+
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+
+    file_names = []
+    splits = []
+    captions = []
+    tokens = []
+    tok_len = []
+    word_freq = Counter()
+    max_len = 100
+
+    for img in tqdm(data['images'], position=0):
+        for sent in img['sentences']:
+            file_names.append(img['filename'])
+            captions.append(sent['raw'])
+            splits.append(img['split'])
+            
+            ## tokens
+            if len(sent['tokens']) <= max_len:
+                tokens.append(sent['tokens'])
+                tok_len.append(len(sent['tokens']))
+
+    df = pd.DataFrame({
+    'file_name': file_names,
+    'split': splits,
+    'caption': captions,
+    'tok_len': tok_len,
+    'tokens': tokens
+})
+
+    print(f"Token Max Length: {df.tok_len.max()}")
+
+    df.to_json(df_name)
