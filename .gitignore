@@ -6,6 +6,7 @@ Images/
 glove.6B/
 *.pth.tar
 coco.json
+dataset_coco.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

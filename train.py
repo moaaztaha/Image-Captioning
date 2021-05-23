@@ -289,6 +289,8 @@ def fit(t_params, checkpoint=None, m_params=None):
         print('_'*50)
         print('-'*20, 'Training', '-'*20)
         # one epoch of training
+        epoch_time = AverageMeter()
+        start_time = time.time()
         train(train_loader=train_loader,
             encoder=encoder,
             decoder=decoder,
@@ -296,14 +298,20 @@ def fit(t_params, checkpoint=None, m_params=None):
             encoder_optimizer=encoder_optimizer,
             decoder_optimizer=decoder_optimizer,
             epoch=epoch)
-        
+        epoch_time.update(time.time() - start_time)
+        print(f"Epoch train time {epoch_time.val:.3f} (epoch_time.avg:.3f)")
+
         # one epoch of validation
+        epoch_time = AverageMeter()
+        start_time = time.time()
         print('-'*20, 'Validation', '-'*20)
         recent_bleu4 = validate(val_loader=val_loader,
             encoder=encoder,
             decoder=decoder,
             criterion=criterion,
             vocab=vocab)
+        epoch_time.update(time.time() - start_time)
+        print(f"Epoch validation time {epoch_time.val:.3f} (epoch_time.avg:.3f)")
 
         
         # check for improvement

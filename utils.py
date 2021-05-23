@@ -129,7 +129,7 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
     return pred_trgs, trgs
 
 
-def print_scores(trgs, preds, nltk=False):
+def print_scores(trgs, preds, nltk=True):
     print('----- Bleu-n Scores -----')
     if nltk:
         print("1:", corpus_bleu(trgs, preds, weights=[1.0/1.0])*100)
@@ -233,14 +233,7 @@ def load_checkpoint(path):
     return checkpoint
 
 
-
-COMMAND1 = '!wget http://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip'
-COMMAND2 = 'unzip -qq caption_datasets.zip'
 def build_dataset(file_path='dataset_coco.json', df_name='coco.json'):
-
-    # download files
-    os.system(COMMAND1)
-    os.system(COMMAND2)
 
     with open(file_path, 'r') as f:
         data = json.load(f)
