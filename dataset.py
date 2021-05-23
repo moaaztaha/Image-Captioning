@@ -5,11 +5,7 @@ import torchvision.transforms as transfroms
 
 from PIL import Image
 import pandas as pd
-import spacy
 from tqdm import tqdm
-
-# set up spacy for English
-spacy_en = spacy.load('en')
 
 
 class CaptionDataset(Dataset):
@@ -88,7 +84,7 @@ def build_vocab(data_file, freq_threshold=2, split=None):
 
 
 class Vocabulary:
-    def __init__(self, freq_threshold=2, max_len=39):
+    def __init__(self, freq_threshold=2, max_len=80):
         self.freq_threshold = freq_threshold
         self.max_len = max_len
         self.itos = {0: "<pad>", 1: "<sos>", 2: "<eos>", 3: "<unk>"}
