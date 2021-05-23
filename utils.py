@@ -234,12 +234,13 @@ def load_checkpoint(path):
 
 
 
-COMMAND = '!wget http://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip'
-
+COMMAND1 = '!wget http://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip'
+COMMAND2 = 'unzip -qq caption_datasets.zip'
 def build_dataset(file_path='dataset_coco.json', df_name='coco.json'):
 
     # download files
-    os.system(COMMAND)
+    os.system(COMMAND1)
+    os.system(COMMAND2)
 
     with open(file_path, 'r') as f:
         data = json.load(f)
