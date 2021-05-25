@@ -268,3 +268,31 @@ def build_dataset(file_path='dataset_coco.json', df_name='coco.json'):
     print(f"Token Max Length: {df.tok_len.max()}")
 
     df.to_json(df_name)
+
+
+def get_topk_vocab(dataset=None, topk=10000):
+    files = ['data.json', 'data30.json', 'coco.json']
+    
+    print(files[0])
+
+
+    # freqs = {}
+    # tokens_list = []
+    # print("asdadadsa")
+    # print(files, 'sss')
+    # for file in files:
+    #     print(file)
+    #     df = pd.read_json(file)
+    #     tokens_list.extend(df.tokens.to_list()) 
+
+
+    # for tokens in tqdm(tokens_list, desc='Counting Frequencies'):
+    #     for word in tokens:
+    #         if word not in freqs:
+    #             freqs[word] = 1
+    #         else:
+    #             freqs[word] += 1
+
+    # top_vocab_dict = dict(sorted(freqs.items(), key=lambda x: x[1], reverse=True))
+    # topk_words = list(top_vocab_dict)[:topk]
+    # return topk_words
