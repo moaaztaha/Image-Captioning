@@ -158,6 +158,7 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                       'Top-5 Accuracy {top5.val:.3f} ({top5.avg:.3f})\t'.format(i, len(val_loader), batch_time=batch_time,
                                                                                 loss=losses, top5=top5accs))
+            
 
 
 
@@ -180,12 +181,18 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
             hypotheses.extend(preds)
 
             assert len(references) == len(hypotheses)
+            
+            # debug
+            # if i % 50 == 0 and i != 0:
+            break
 
+        # debug
+        # return references, hypotheses
         # Calculate BLEU-4 scores
         bleu4 = corpus_bleu(references, hypotheses)
 
         # print scores
-        print_scores(hypotheses, references)
+        print_scores(references, hypotheses)
 
         print(
             '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(

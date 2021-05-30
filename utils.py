@@ -5,7 +5,7 @@ import torch.optim as optim
 import torchvision.models as models
 import torchvision.transforms as transforms
 from nltk.translate.bleu_score import corpus_bleu
-from torchtext.data.metrics import bleu_score
+# from torchtext.data.metrics import bleu_score
 import torch.optim as optim
 
 import matplotlib.pyplot as plt
@@ -131,18 +131,18 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
 
 def print_scores(trgs, preds, nltk=True):
     print('----- Bleu-n Scores -----')
-    if nltk:
-        print("1:", corpus_bleu(trgs, preds, weights=[1.0/1.0])*100)
-        print("2:", corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100)
-        print("3:", corpus_bleu(trgs, preds, weights=[1.0/3.0, 1.0/3.0, 1.0/3.0])*100)
-        print("4:", corpus_bleu(trgs, preds)*100)
-        print('-'*25)
-    else:
-        print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
-        print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
-        print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
-        print("4:", bleu_score(preds, trgs)*100)
-        print('-'*25)
+    # if nltk:
+    print("1:", corpus_bleu(trgs, preds, weights=[1.0/1.0])*100)
+    print("2:", corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100)
+    print("3:", corpus_bleu(trgs, preds, weights=[1.0/3.0, 1.0/3.0, 1.0/3.0])*100)
+    print("4:", corpus_bleu(trgs, preds)*100)
+    print('-'*25)
+    # else:
+    #     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
+    #     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
+    #     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
+    #     print("4:", bleu_score(preds, trgs)*100)
+    #     print('-'*25)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
