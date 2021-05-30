@@ -184,7 +184,7 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
             
             # debug
             # if i % 50 == 0 and i != 0:
-            break
+            # break
 
         # debug
         # return references, hypotheses
