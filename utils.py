@@ -5,6 +5,7 @@ import torch.optim as optim
 import torchvision.models as models
 import torchvision.transforms as transforms
 from nltk.translate.bleu_score import corpus_bleu
+from nltk.translate.meteor_score import meteor_score
 # from torchtext.data.metrics import bleu_score
 import torch.optim as optim
 
@@ -131,18 +132,30 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
 
 def print_scores(trgs, preds, nltk=True):
     print('----- Bleu-n Scores -----')
-    # if nltk:
-    print("1:", corpus_bleu(trgs, preds, weights=[1.0/1.0])*100)
-    print("2:", corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100)
-    print("3:", corpus_bleu(trgs, preds, weights=[1.0/3.0, 1.0/3.0, 1.0/3.0])*100)
-    print("4:", corpus_bleu(trgs, preds)*100)
+    b1 = corpus_bleu(trgs, preds, weights=[1.0/1.0])*100
+    b2 = corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100
+    b3 = corpus_bleu(trgs, preds, weights=[1.0/3.0, 1.0/3.0, 1.0/3.0])*100
+    b4 = corpus_bleu(trgs, preds)*100
+    print("1:", b1)
+    print("2:", b2)
+    print("3:", b3)
+    print("4:", b4)
     print('-'*25)
+    print("----- METEOR Score -----")
+    # ids to words
+    hs = [" ".join([vocab.itos[i] for i in preds[0]]) for sent in preds]
+    rs = []
+    for r in trgs:
+        rs.append([" ".join([vocab.itos[i] for i in sent]) for sent in r])
+
+    return b1, b2, b3, b4
     # else:
     #     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
     #     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
     #     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
     #     print("4:", bleu_score(preds, trgs)*100)
     #     print('-'*25)
+
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
