@@ -45,7 +45,7 @@ def show_image(image=None, file_name=False, root_dir=None):
         plt.show()
 
 
-def caption_image(image, model, vocab, max_len=50):
+def caption_image(image, model, vocab, max_len=100):
 
     model.eval()
     result_caption = []
@@ -100,7 +100,7 @@ def get_test_data(df_path):
     return test_dict
 
 
-def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
+def predict_test(test_dict, imgs_path, model, vocab, max_len=100, n_images=100):
 
     trgs = []
     pred_trgs = []
@@ -130,7 +130,7 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=50, n_images=100):
     return pred_trgs, trgs
 
 
-def print_scores(trgs, preds, nltk=True):
+def print_scores(trgs, preds, vocab=None):
     print('----- Bleu-n Scores -----')
     b1 = corpus_bleu(trgs, preds, weights=[1.0/1.0])*100
     b2 = corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100
@@ -143,12 +143,27 @@ def print_scores(trgs, preds, nltk=True):
     print('-'*25)
     print("----- METEOR Score -----")
     # ids to words
-    hs = [" ".join([vocab.itos[i] for i in preds[0]]) for sent in preds]
-    rs = []
-    for r in trgs:
-        rs.append([" ".join([vocab.itos[i] for i in sent]) for sent in r])
 
-    return b1, b2, b3, b4
+    if vocab != None:
+        preds = [" ".join(word for word in sent) for sent in vocab.indextostring(preds)]
+        rs = []
+        for r in trgs:
+            rs.append([" ".join(word for word in sent) for sent in vocab.indextostring(r)])
+        trgs = rs
+    else:
+        preds = [" ".join(word for word in sent) for sent in preds]
+        rs = []
+        for r in trgs:
+            rs.append([" ".join(word for word in sent) for sent in r])
+        trgs = rs
+        
+    
+    total_meteor = 0
+    for r, h in tqdm(zip(trgs, preds), total=len(trgs)):
+        total_meteor += meteor_score(r, h)
+    m = total_meteor/len(rs)
+    print("m:", m)
+    return b1, b2, b3, b4, m
     # else:
     #     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
     #     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)

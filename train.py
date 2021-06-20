@@ -21,7 +21,7 @@ print_freq = 100  # print training/validation stats every __ batches
 
 
 
-def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_optimizer, epoch):
+def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_optimizer, epoch, logger=None):
     # performs one epoch's training
 
     
@@ -98,9 +98,14 @@ def train(train_loader, encoder, decoder, criterion, encoder_optimizer, decoder_
                                                                           batch_time=batch_time,
                                                                           data_time=data_time, loss=losses,
                                                                           top5=top5accs))
+            
+        # tensorboard 
+        logger.add_scalar(f'Loss/train/{str(epoch)}', losses.val, i)
+        logger.add_scalar(f'top5acc/train/{str(epoch)}', top5accs.val, i)
+        
         
 
-def validate(val_loader, encoder, decoder, criterion, vocab):
+def validate(val_loader, encoder, decoder, criterion, vocab, epoch=None, logger=None):
 
     decoder.eval()
     if encoder is not None:
@@ -159,6 +164,9 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
                       'Top-5 Accuracy {top5.val:.3f} ({top5.avg:.3f})\t'.format(i, len(val_loader), batch_time=batch_time,
                                                                                 loss=losses, top5=top5accs))
             
+            # tensorboard 
+            logger.add_scalar(f'Loss/valid/{str(epoch)}', losses.val, i)
+            logger.add_scalar(f'top5acc/valid/{str(epoch)}', top5accs.val, i)
 
 
 
@@ -189,22 +197,22 @@ def validate(val_loader, encoder, decoder, criterion, vocab):
         # debug
         # return references, hypotheses
         # Calculate BLEU-4 scores
-        bleu4 = corpus_bleu(references, hypotheses)
+        #bleu4 = corpus_bleu(references, hypotheses)
 
         # print scores
-        print_scores(references, hypotheses)
+        b1, b2, b3, b4, m = print_scores(references, hypotheses)
 
         print(
             '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(
                 loss=losses,
                 top5=top5accs,
-                bleu=bleu4))
+                bleu=b4))
+        
+    return b1, b2, b3, b4, m
 
-    return bleu4
 
 
-
-def fit(t_params, checkpoint=None, m_params=None):
+def fit(t_params, checkpoint=None, m_params=None, logger=None):
 
     # info
     data_name = t_params['data_name']
@@ -304,7 +312,8 @@ def fit(t_params, checkpoint=None, m_params=None):
             criterion=criterion,
             encoder_optimizer=encoder_optimizer,
             decoder_optimizer=decoder_optimizer,
-            epoch=epoch)
+            epoch=epoch,
+            logger=logger)
         epoch_time.update(time.time() - start_time)
         print(f"Epoch train time {epoch_time.val:.3f} (epoch_time.avg:.3f)")
 
@@ -312,12 +321,20 @@ def fit(t_params, checkpoint=None, m_params=None):
         epoch_time = AverageMeter()
         start_time = time.time()
         print('-'*20, 'Validation', '-'*20)
-        recent_bleu4 = validate(val_loader=val_loader,
+        b1, b2, b3, recent_bleu4, m = validate(val_loader=val_loader,
             encoder=encoder,
             decoder=decoder,
             criterion=criterion,
-            vocab=vocab)
+            vocab=vocab,
+            epoch=epoch,
+            logger=logger)
         epoch_time.update(time.time() - start_time)
+        # tensorboard 
+        logger.add_scalar(f'b-1/valid', b1, epoch)
+        logger.add_scalar(f'b-2/valid', b2, epoch)
+        logger.add_scalar(f'b-3/valid', b3, epoch)
+        logger.add_scalar(f'b-4/valid', recent_bleu4, epoch)
+        logger.add_scalar(f'Meteor/valid', m, epoch)
         print(f"Epoch validation time {epoch_time.val:.3f} (epoch_time.avg:.3f)")
 
         
