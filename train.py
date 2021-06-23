@@ -371,7 +371,7 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
 
         # stop training if no improvement for 5 epochs
         if epochs_since_improvement == 5:
-            print('No improvement for 3 consecutive epochs, terminating...')
+            print('No improvement for 5 consecutive epochs, terminating...')
             break
         
         # learning rate schedular

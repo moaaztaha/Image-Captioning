@@ -141,7 +141,7 @@ def print_scores(trgs, preds, vocab=None):
     print("3:", b3)
     print("4:", b4)
     print('-'*25)
-    print("----- METEOR Score -----")
+    # print("----- METEOR Score -----")
     # ids to words
 
     # if vocab != None:
@@ -248,9 +248,12 @@ def accuracy(scores, targets, k):
     return correct_total.item() * (100.0 / batch_size)
 
 
-def load_checkpoint(path):
+def load_checkpoint(path, cpu=True):
 
-    checkpoint = torch.load(path)
+    if cpu:
+        checkpoint = torch.load(path, map_location=torch.device('cpu'))
+    else: 
+        checkpoint = torch.load(path)
     
     print('Loaded Checkpoint!!')
     last_epoch = checkpoint['epoch']
