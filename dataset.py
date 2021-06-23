@@ -6,6 +6,7 @@ import torchvision.transforms as transfroms
 from PIL import Image
 import pandas as pd
 from tqdm import tqdm
+import pickle
 
 
 class CaptionDataset(Dataset):
@@ -70,10 +71,10 @@ class CaptionDataset(Dataset):
             return img, caption, cap_len, torch.tensor(all_tokens)
 
 
-def build_vocab(data_file, freq_threshold=2, split=None):
+def build_vocab(data_file, freq_threshold=2):
     df = pd.read_json(data_file)
-    if split:
-        df = df[df['split'] == split]
+    # if split:
+    #     df = df[df['split'] == split]
 
     tokens = df.tokens.values
 
@@ -81,6 +82,22 @@ def build_vocab(data_file, freq_threshold=2, split=None):
     vocab.build_vocabulary(tokens)
 
     return vocab
+
+def top10k_vocab(words_list):
+    
+    tokens = [words_list]
+    
+    vocab = Vocabulary(1) # threshold = 0 to include all
+    vocab.build_vocabulary(tokens)
+    return vocab
+
+def get_10k_vocab():
+    # loading words list
+    with open("10k_words.txt", "rb") as f:
+        top10kwords = pickle.load(f)
+    
+
+
 
 
 class Vocabulary:
@@ -96,6 +113,7 @@ class Vocabulary:
     # @staticmethod
     # def tokenize_en(text):
     #     return [tok.text for tok in spacy_en.tokenizer(text.lower())]
+
 
     def build_vocabulary(self, tokens_list):
         freqs = {}
