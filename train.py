@@ -5,6 +5,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from models import Encoder, DecoderWithAttention
 from dataset import *
 from utils import *
@@ -250,10 +251,16 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
         decoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, decoder.parameters()),
                                             lr=decoder_lr)
         
+        decoder_scheduler = ReduceLROnPlateau(decoder_optimizer)
+
+
         encoder=Encoder()
         encoder.fine_tune(fine_tune_encoder)
         encoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, encoder.parameters()),
                                             lr=encoder_lr) if fine_tune_encoder else None
+        if fine_tune_encoder:
+            encoder_scheduler = ReduceLROnPlateau(encoder_optimizer)
+        
     # load checkpoint
     else:
         checkpoint = torch.load(checkpoint)
@@ -291,15 +298,11 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
 
     print('-'*20, 'Fitting', '-'*20)
     for epoch in range(start_epoch, epochs):
-        
-        # decay lr is there is no improvement for 8 consecutive epochs and terminate after 20
-        if epochs_since_improvement == 20:
-            print('No improvement for 20 consecutive epochs, terminating...')
-            break
-        if epochs_since_improvement > 0 and epochs_since_improvement % 8 == 0:
-            adjust_learning_rate(decoder_optimizer, 0.8)
-            if fine_tune_encoder:
-                adjust_learning_rate(encoder_optimizer, 0.8)
+
+        # if epochs_since_improvement > 0 and epochs_since_improvement % 2 == 0:
+        #     adjust_learning_rate(decoder_optimizer, 0.8)
+        #     if fine_tune_encoder:
+        #         adjust_learning_rate(encoder_optimizer, 0.8)
         
         print('_'*50)
         print('-'*20, 'Training', '-'*20)
@@ -348,5 +351,16 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
             # reset
             epochs_since_improvement = 0
         
+
+        # stop training if no improvement for 5 epochs
+        if epochs_since_improvement == 5:
+            print('No improvement for 3 consecutive epochs, terminating...')
+            break
+        
+        # learning rate schedular
+        decoder_scheduler.step(recent_bleu4)
+        if fine_tune_encoder:
+            encoder_scheduler.step(recent_bleu4)
+
         save_checkpoint(data_name, epoch, epochs_since_improvement, encoder, decoder, encoder_optimizer,
             decoder_optimizer, recent_bleu4, is_best)
