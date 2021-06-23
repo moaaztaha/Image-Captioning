@@ -233,8 +233,9 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
 
     # pretrained word embeddings
     pretrained_embeddings = t_params['pretrained_embeddings']
-    fine_tune_embeddings = t_params['fine_tune_embeddings']
-    embeddings_matrix = m_params['embeddings_matrix']
+    if pretrained_embeddings:
+        fine_tune_embeddings = t_params['fine_tune_embeddings']
+        embeddings_matrix = m_params['embeddings_matrix']
 
 
 
@@ -288,9 +289,9 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
                                                 lr=encoder_lr)
     
     # Schedulers
-    decoder_scheduler = ReduceLROnPlateau(decoder_optimizer, verbose=True)
+    decoder_scheduler = ReduceLROnPlateau(decoder_optimizer, patience=2, verbose=True)
     if fine_tune_encoder:
-        encoder_scheduler = ReduceLROnPlateau(encoder_optimizer, verbose=True)
+        encoder_scheduler = ReduceLROnPlateau(encoder_optimizer, patience=2, verbose=True)
 
 
     # move to gpu, if available
