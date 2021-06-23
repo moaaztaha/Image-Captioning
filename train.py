@@ -231,6 +231,12 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
     decoder_lr = t_params['decoder_lr']
     fine_tune_encoder = t_params['fine_tune_encoder']
 
+    # pretrained word embeddings
+    pretrained_embeddings = t_params['pretrained_embeddings']
+    fine_tune_embeddings = t_params['fine_tune_embeddings']
+    embeddings_matrix = m_params['embeddings_matrix']
+
+
 
     # init / load checkpoint
     if checkpoint is None:
@@ -248,18 +254,21 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
                                       encoder_dim=encoder_dim,
                                       vocab_size=len(vocab),
                                       dropout=dropout)
+        
+        if pretrained_embeddings:
+            decoder.load_pretrained_embeddings(torch.tensor(embeddings_matrix, dtype=torch.float32))
+            decoder.fine_tune_embeddings(fine_tune=fine_tune_embeddings)
+        
         decoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, decoder.parameters()),
                                             lr=decoder_lr)
         
-        decoder_scheduler = ReduceLROnPlateau(decoder_optimizer)
 
 
         encoder=Encoder()
         encoder.fine_tune(fine_tune_encoder)
         encoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, encoder.parameters()),
                                             lr=encoder_lr) if fine_tune_encoder else None
-        if fine_tune_encoder:
-            encoder_scheduler = ReduceLROnPlateau(encoder_optimizer)
+
         
     # load checkpoint
     else:
@@ -277,6 +286,13 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
             encoder.fine_tune(fine_tune_encoder)
             encoder_optimizer = torch.optim.RMSprop(params=filter(lambda p:p.requires_grad, encoder.parameters()),
                                                 lr=encoder_lr)
+    
+    # Schedulers
+    decoder_scheduler = ReduceLROnPlateau(decoder_optimizer, verbose=True)
+    if fine_tune_encoder:
+        encoder_scheduler = ReduceLROnPlateau(encoder_optimizer, verbose=True)
+
+
     # move to gpu, if available
     decoder = decoder.to(device)
     encoder = encoder.to(device)
