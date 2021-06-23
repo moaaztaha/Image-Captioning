@@ -248,7 +248,7 @@ def accuracy(scores, targets, k):
     return correct_total.item() * (100.0 / batch_size)
 
 
-def load_checkpoint(path, cpu=True):
+def load_checkpoint(path, cpu=False):
 
     if cpu:
         checkpoint = torch.load(path, map_location=torch.device('cpu'))

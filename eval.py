@@ -142,5 +142,5 @@ def test_score(beam_size, encoder, decoder, imgs_path, df_path, vocab):
 
     # Calculate BLEU-4 scores
 #     bleu4 = corpus_bleu(references, hypotheses)
-    b1,b2, b3, b4, m = print_scores(references, hypotheses, vocab=vocab)
-    return b1,b2, b3, b4, m
+    b1,b2, b3, b4 = print_scores(references, hypotheses, vocab=vocab)
+    return b1,b2, b3, b4
