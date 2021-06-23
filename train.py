@@ -201,7 +201,7 @@ def validate(val_loader, encoder, decoder, criterion, vocab, epoch=None, logger=
         #bleu4 = corpus_bleu(references, hypotheses)
 
         # print scores
-        b1, b2, b3, b4, m = print_scores(references, hypotheses)
+        b1, b2, b3, b4 = print_scores(references, hypotheses)
 
         print(
             '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(
@@ -209,7 +209,7 @@ def validate(val_loader, encoder, decoder, criterion, vocab, epoch=None, logger=
                 top5=top5accs,
                 bleu=b4))
         
-    return b1, b2, b3, b4, m
+    return b1, b2, b3, b4
 
 
 
@@ -340,7 +340,7 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
         epoch_time = AverageMeter()
         start_time = time.time()
         print('-'*20, 'Validation', '-'*20)
-        b1, b2, b3, recent_bleu4, m = validate(val_loader=val_loader,
+        b1, b2, b3, recent_bleu4 = validate(val_loader=val_loader,
             encoder=encoder,
             decoder=decoder,
             criterion=criterion,
@@ -353,7 +353,7 @@ def fit(t_params, checkpoint=None, m_params=None, logger=None):
         logger.add_scalar(f'b-2/valid', b2, epoch)
         logger.add_scalar(f'b-3/valid', b3, epoch)
         logger.add_scalar(f'b-4/valid', recent_bleu4, epoch)
-        logger.add_scalar(f'Meteor/valid', m, epoch)
+        # logger.add_scalar(f'Meteor/valid', m, epoch)
         print(f"Epoch validation time {epoch_time.val:.3f} (epoch_time.avg:.3f)")
 
         

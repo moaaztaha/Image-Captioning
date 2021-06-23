@@ -5,7 +5,7 @@ import torch.optim as optim
 import torchvision.models as models
 import torchvision.transforms as transforms
 from nltk.translate.bleu_score import corpus_bleu
-from nltk.translate.meteor_score import meteor_score
+# from nltk.translate.meteor_score import meteor_score
 # from torchtext.data.metrics import bleu_score
 import torch.optim as optim
 
@@ -144,26 +144,26 @@ def print_scores(trgs, preds, vocab=None):
     print("----- METEOR Score -----")
     # ids to words
 
-    if vocab != None:
-        preds = [" ".join(word for word in sent) for sent in vocab.indextostring(preds)]
-        rs = []
-        for r in trgs:
-            rs.append([" ".join(word for word in sent) for sent in vocab.indextostring(r)])
-        trgs = rs
-    else:
-        preds = [" ".join(word for word in sent) for sent in preds]
-        rs = []
-        for r in trgs:
-            rs.append([" ".join(word for word in sent) for sent in r])
-        trgs = rs
+    # if vocab != None:
+    #     preds = [" ".join(word for word in sent) for sent in vocab.indextostring(preds)]
+    #     rs = []
+    #     for r in trgs:
+    #         rs.append([" ".join(word for word in sent) for sent in vocab.indextostring(r)])
+    #     trgs = rs
+    # else:
+    #     preds = [" ".join(word for word in sent) for sent in preds]
+    #     rs = []
+    #     for r in trgs:
+    #         rs.append([" ".join(word for word in sent) for sent in r])
+    #     trgs = rs
         
     
-    total_meteor = 0
-    for r, h in tqdm(zip(trgs, preds), total=len(trgs)):
-        total_meteor += meteor_score(r, h)
-    m = total_meteor/len(rs)
-    print("m:", m)
-    return b1, b2, b3, b4, m
+    # total_meteor = 0
+    # for r, h in tqdm(zip(trgs, preds), total=len(trgs)):
+    #     total_meteor += meteor_score(r, h)
+    # m = total_meteor/len(rs)
+    # print("m:", m)
+    return b1, b2, b3, b4
     # else:
     #     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
     #     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
