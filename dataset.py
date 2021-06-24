@@ -96,7 +96,7 @@ def get_10k_vocab(path="10k_words.txt"):
     with open(path, "rb") as f:
         top10kwords = pickle.load(f)
     
-    return top10k_vocab
+    return top10kwords
     
 
 
