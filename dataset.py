@@ -91,9 +91,9 @@ def top10k_vocab(words_list):
     vocab.build_vocabulary(tokens)
     return vocab
 
-def get_10k_vocab():
-    # loading words list
-    with open("10k_words.txt", "rb") as f:
+def get_10k_vocab(path="10k_words.txt"):
+    # loading words list 
+    with open(path, "rb") as f:
         top10kwords = pickle.load(f)
     
 
