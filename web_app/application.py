@@ -42,7 +42,7 @@ def server_error(e):
 @app.route("/", methods=['GET'])
 def startup():
     # downloading the model
-    os.system('gdown --id 1-EBq2P5OuhXaphj6VkrqtMAlpN2I4jeb')
+    os.system('gdown --id 1-jm7vqtFj4ejbBnWgThTmn4Ak4oacI2W')
     return render_template('index.html') # pred_class
 
 from caption import caption_image
