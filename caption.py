@@ -12,6 +12,8 @@ from models import *
 
 import sys
 
+
+
 # transforms
 tt = transforms.Compose([
     transforms.Resize(256),
@@ -23,7 +25,7 @@ tt = transforms.Compose([
 
 
 vocab = build_vocab('data.json')
-checkpoint = load_checkpoint('models/BEST_checkpoint_flickr8k_5_cap_per_img_2_min_word_freq_resnet101_fullvocab_fix_ds_2.pth.tar')
+checkpoint = load_checkpoint('models/BEST_checkpoint_flickr8k_5_cap_per_img_2_min_word_freq_resnet101_fullvocab_fix_ds_2.pth.tar', cpu=True)
 
 device = torch.device( 'cpu')
 
