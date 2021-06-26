@@ -1,16 +1,13 @@
 from flask import Flask, render_template, flash, request, jsonify, Markup
 import os
-import torch
 from pathlib2 import Path
 import logging
-from modules.Beam_search import *
 from PIL import Image
 import json
-from torchvision import transforms
 #import settings
 
 #set devise
-device = 'cpu'
+# device = 'cpu'
 #defaults.device = torch.device('cpu')
 
 # Load model architecture and parameters
