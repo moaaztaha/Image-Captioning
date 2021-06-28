@@ -25,7 +25,7 @@ def caption_image(img_path):
 
 
     vocab = build_vocab('ar_data.json')
-    checkpoint = load_checkpoint('BEST_checkpoint_flickr8k.pth.tar', cpu=True)
+    checkpoint = load_checkpoint('E:\GP\Image-Captioning\models\BEST_checkpoint_flickr8k_ar_finetune.pth.tar', cpu=True)
 
     device = torch.device( 'cpu')
 
