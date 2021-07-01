@@ -72,10 +72,14 @@
             processData: false,
             async: true,
             success: function (data) {
+                $('#result').text("")
+                for (s in data['caps']) {
+                    $('#result').append('<br>' + data['caps'][s])
+                }
                 // Get and display the result
                 $('.loader').hide();
                 $('#result').fadeIn(600);
-                $('#result').text(data);
+                // $('#result').text(data);
                 console.log('Success!');
     },
 });

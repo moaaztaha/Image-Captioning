@@ -59,8 +59,10 @@ def predict():
         # return ' '.join(caps)#jsonify(predict=str(pred_class))
                 #app.logger.info("Image %s classified as %s" % (url, pred_class))
         caps = caption_image(upload_path)
-        print(caps)
-        return caps
+        caps = {"caps":caps}
+        # print(caps)
+
+        return jsonify(caps)
     return None
 
 
