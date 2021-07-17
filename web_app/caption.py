@@ -25,12 +25,12 @@ def caption_image(img_path, beam_size=3):
 
 
     # english
-    # vocab = build_vocab('data.json')
-    # checkpoint = load_checkpoint('E:\GP\Image-Captioning\models\BEST_checkpoint_flickr8k_finetune.pth.tar', cpu=True)
+    vocab = build_vocab('data.json')
+    checkpoint = load_checkpoint('E:\GP\Image-Captioning\models\BEST_checkpoint_flickr8k_finetune.pth.tar', cpu=True)
 
     # arabic
-    vocab = build_vocab('ar_data.json')
-    checkpoint = load_checkpoint('E:\GP\Image-Captioning\models\BEST_checkpoint_flickr8k_ar_finetune.pth.tar', cpu=True)
+    # vocab = build_vocab('ar_data.json')
+    # checkpoint = load_checkpoint('E:\GP\Image-Captioning\models\BEST_checkpoint_flickr8k_ar_finetune.pth.tar', cpu=True)
 
 
     addit_tokens = [vocab.stoi['<sos>'], vocab.stoi['<eos>'], vocab.stoi['<pad>']]

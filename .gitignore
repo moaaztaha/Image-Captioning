@@ -9,6 +9,11 @@ coco.json
 dataset_coco.json
 experiments/
 web_app/tmp/
+
+
+arabert/
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

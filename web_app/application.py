@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, request, jsonify, Markup
 import os
-from pathlib2 import Path
+# from pathlib2 import Path
 import logging
-from PIL import Image
+# from PIL import Image
 import json
 #import settings
 
@@ -11,7 +11,7 @@ import json
 #defaults.device = torch.device('cpu')
 
 # Load model architecture and parameters
-path = Path() 
+# path = Path() 
 
 # checkpoint_path = "models/Best_model.pth"
 
