@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import numpy as np
 import json
 import torchvision.transforms as transforms
+from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 from PIL import Image
 
