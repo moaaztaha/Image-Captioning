@@ -130,18 +130,19 @@ def predict_test(test_dict, imgs_path, model, vocab, max_len=100, n_images=100):
     return pred_trgs, trgs
 
 
-def print_scores(trgs, preds, vocab=None):
-    print('----- Bleu-n Scores -----')
+def print_scores(trgs, preds, vocab=None, prnt=True):
     b1 = corpus_bleu(trgs, preds, weights=[1.0/1.0])*100
     b2 = corpus_bleu(trgs, preds, weights=[1.0/2.0, 1.0/2.0])*100
     b3 = corpus_bleu(trgs, preds, weights=[1.0/3.0, 1.0/3.0, 1.0/3.0])*100
     b4 = corpus_bleu(trgs, preds)*100
-    print("1:", b1)
-    print("2:", b2)
-    print("3:", b3)
-    print("4:", b4)
-    print('-'*25)
-    # print("----- METEOR Score -----")
+    if prnt:
+        print('----- Bleu-n Scores -----')
+        print("1:", b1)
+        print("2:", b2)
+        print("3:", b3)
+        print("4:", b4)
+        print('-'*25)
+        # print("----- METEOR Score -----")
     # ids to words
 
     # if vocab != None:
