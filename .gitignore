@@ -13,6 +13,14 @@ web_app/tmp/
 
 arabert/
 .idea/
+captions_train2017.json
+captions_train2017.json
+data/captions_val2014.json
+images_200/
+images_urls.csv
+arabicf.xls
+arabicf.xlsx
+captions_val2017.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
