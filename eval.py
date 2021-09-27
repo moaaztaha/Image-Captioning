@@ -18,7 +18,7 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-def test_score(beam_size, encoder, decoder, imgs_path, df_path, vocab):
+def test_score(beam_size, encoder, decoder, imgs_path, df_path, vocab, return_results=False):
 
     loader = get_loaders(1, imgs_path, df_path, transform, vocab, test=True, n_workers=8)
     vocab_size = len(vocab)
@@ -143,4 +143,8 @@ def test_score(beam_size, encoder, decoder, imgs_path, df_path, vocab):
     # Calculate BLEU-4 scores
 #     bleu4 = corpus_bleu(references, hypotheses)
     b1,b2, b3, b4 = print_scores(references, hypotheses, vocab=vocab)
+    
+    if return_results:
+        return references, hypotheses
+    
     return b1,b2, b3, b4
