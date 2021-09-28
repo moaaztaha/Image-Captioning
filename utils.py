@@ -137,40 +137,12 @@ def print_scores(trgs, preds, vocab=None, prnt=True):
     b4 = corpus_bleu(trgs, preds)*100
     if prnt:
         print('----- Bleu-n Scores -----')
-        print("1:", b1)
-        print("2:", b2)
-        print("3:", b3)
-        print("4:", b4)
+        print(f"1: {b1:.3f}")
+        print(f"2: {b2:.3f}")
+        print(f"3: {b3:.3f}")
+        print(f"4: {b4:.3f}")
         print('-'*25)
-        # print("----- METEOR Score -----")
-    # ids to words
-
-    # if vocab != None:
-    #     preds = [" ".join(word for word in sent) for sent in vocab.indextostring(preds)]
-    #     rs = []
-    #     for r in trgs:
-    #         rs.append([" ".join(word for word in sent) for sent in vocab.indextostring(r)])
-    #     trgs = rs
-    # else:
-    #     preds = [" ".join(word for word in sent) for sent in preds]
-    #     rs = []
-    #     for r in trgs:
-    #         rs.append([" ".join(word for word in sent) for sent in r])
-    #     trgs = rs
-        
-    
-    # total_meteor = 0
-    # for r, h in tqdm(zip(trgs, preds), total=len(trgs)):
-    #     total_meteor += meteor_score(r, h)
-    # m = total_meteor/len(rs)
-    # print("m:", m)
-    return b1, b2, b3, b4
-    # else:
-    #     print("1:", bleu_score(preds, trgs, max_n=1, weights=[1])*100)
-    #     print("2:", bleu_score(preds, trgs, max_n=2, weights=[.5, .5])*100)
-    #     print("3:", bleu_score(preds, trgs, max_n=3, weights=[.33, .33, .33])*100)
-    #     print("4:", bleu_score(preds, trgs)*100)
-    #     print('-'*25)
+    return round(b1, 3), round(b2, 3), round(b3, 3), round(b4, 3)
 
 
 def epoch_time(start_time, end_time):
