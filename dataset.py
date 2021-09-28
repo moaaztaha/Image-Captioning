@@ -40,12 +40,14 @@ class CaptionDataset(Dataset):
         print(f"Total size: {self.dataset_size}")
 
     def __len__(self):
+        if self.split == 'test':
+            return self.df.file_name.nunique()
         return self.dataset_size
 
     def __getitem__(self, index):
 
         # loading the image
-        img_id = self.df['file_name'].values[index]
+        img_id = self.df['file_name'].unique()[index]
         img = Image.open(self.imgs_dir+img_id).convert("RGB")
 
         if self.transforms is not None:

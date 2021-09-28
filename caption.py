@@ -45,12 +45,14 @@ class CaptionDataset(Dataset):
         print(f"Total size: {self.dataset_size}")
 
     def __len__(self):
+        if self.split == 'test':
+            return self.df.file_name.nunique()
         return self.dataset_size
 
     def __getitem__(self, index):
 
-        # loading the image
-        img_id = self.df['file_name'].values[index]
+        # loading the image 
+        img_id = self.df['file_name'].unique()[index]
         img = Image.open(self.imgs_dir+img_id).convert("RGB")
 
         if self.transforms is not None:
@@ -82,6 +84,7 @@ def caption_image(loader, vocab, encoder, decoder, beam_size):
     hypotheses = list()
     img_ids = list()
 
+    no_com = 0
     # For each image
     for i, (image, caps, caplens, allcaps, img_id) in enumerate(
             tqdm(loader, desc="EVALUATING AT BEAM SIZE " + str(beam_size), position=0, leave=True)):
@@ -180,6 +183,8 @@ def caption_image(loader, vocab, encoder, decoder, beam_size):
             step += 1
 
         if len(complete_seqs_scores) == 0:
+            # print("No completed Sequences")
+            no_com+=1
             continue
         i = complete_seqs_scores.index(max(complete_seqs_scores))
         seq = complete_seqs[i]
@@ -196,6 +201,7 @@ def caption_image(loader, vocab, encoder, decoder, beam_size):
 
         img_ids.append(img_id[0])
         assert len(references) == len(hypotheses) == len(img_ids)
+    print("Number of NO COMPLETED: ", no_com)
     # Calculate BLEU-4 scores
     #     bleu4 = corpus_bleu(references, hypotheses)
     return references, hypotheses, img_ids
